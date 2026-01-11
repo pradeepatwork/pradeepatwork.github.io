@@ -15,11 +15,27 @@ const ParticleBackground: React.FC = () => {
     let animationFrameId: number;
     let particles: Particle[] = [];
     
-    const COUNT = 160; 
-    const CONNECT_DIST = 170;
-    const MOUSE_RADIUS = 220;
-    const DISPERSE_STRENGTH = 2.5;
-    const FRICTION = 0.94;
+    // Performance Tuning Parameters
+    const getSettings = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const area = width * height;
+      
+      // Dynamic density: 1 particle per ~9000 pixels, with bounds
+      const count = Math.min(Math.max(Math.floor(area / 9000), 40), 160);
+      
+      // Scale connection distance and interaction based on screen size
+      const isMobile = width < 768;
+      return {
+        count,
+        connectDist: isMobile ? 110 : 160,
+        mouseRadius: isMobile ? 150 : 220,
+        disperseStrength: 2.2,
+        friction: 0.95
+      };
+    };
+
+    let settings = getSettings();
 
     class Particle {
       x: number;
@@ -34,28 +50,28 @@ const ParticleBackground: React.FC = () => {
       constructor(w: number, h: number) {
         this.x = Math.random() * w;
         this.y = Math.random() * h;
-        this.baseVx = (Math.random() - 0.5) * 0.4;
-        this.baseVy = (Math.random() - 0.5) * 0.4;
+        this.baseVx = (Math.random() - 0.5) * 0.35;
+        this.baseVy = (Math.random() - 0.5) * 0.35;
         this.vx = this.baseVx;
         this.vy = this.baseVy;
-        this.size = Math.random() * 2 + 0.5;
-        this.color = Math.random() > 0.9 ? '#38bdf8' : '#1e293b';
+        this.size = Math.random() * 1.5 + 0.5;
+        this.color = Math.random() > 0.92 ? '#38bdf8' : '#1e293b';
       }
 
       update(w: number, h: number, mouse: { x: number; y: number }) {
-        this.vx *= FRICTION;
-        this.vy *= FRICTION;
-        this.vx += this.baseVx * 0.1;
-        this.vy += this.baseVy * 0.1;
+        this.vx *= settings.friction;
+        this.vy *= settings.friction;
+        this.vx += this.baseVx * 0.08;
+        this.vy += this.baseVy * 0.08;
 
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < MOUSE_RADIUS) {
+        if (distance < settings.mouseRadius) {
           const angle = Math.atan2(dy, dx);
-          const force = Math.pow((MOUSE_RADIUS - distance) / MOUSE_RADIUS, 1.5);
-          const push = force * 15 * DISPERSE_STRENGTH;
+          const force = Math.pow((settings.mouseRadius - distance) / settings.mouseRadius, 1.5);
+          const push = force * 12 * settings.disperseStrength;
           this.vx -= Math.cos(angle) * push;
           this.vy -= Math.sin(angle) * push;
         }
@@ -63,10 +79,11 @@ const ParticleBackground: React.FC = () => {
         this.x += this.vx;
         this.y += this.vy;
 
-        if (this.x < -10) this.x = w + 10;
-        if (this.x > w + 10) this.x = -10;
-        if (this.y < -10) this.y = h + 10;
-        if (this.y > h + 10) this.y = -10;
+        // Wrap around logic
+        if (this.x < -20) this.x = w + 20;
+        if (this.x > w + 20) this.x = -20;
+        if (this.y < -20) this.y = h + 20;
+        if (this.y > h + 20) this.y = -20;
       }
 
       draw() {
@@ -76,8 +93,9 @@ const ParticleBackground: React.FC = () => {
         ctx.fillStyle = this.color;
         ctx.fill();
         
+        // Only glow the highlight particles to save performance
         if (this.color === '#38bdf8') {
-          ctx.shadowBlur = 8;
+          ctx.shadowBlur = 6;
           ctx.shadowColor = '#38bdf8';
         } else {
           ctx.shadowBlur = 0;
@@ -88,8 +106,9 @@ const ParticleBackground: React.FC = () => {
     const init = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      settings = getSettings();
       particles = [];
-      for (let i = 0; i < COUNT; i++) {
+      for (let i = 0; i < settings.count; i++) {
         particles.push(new Particle(canvas.width, canvas.height));
       }
     };
@@ -99,23 +118,45 @@ const ParticleBackground: React.FC = () => {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.shadowBlur = 0;
 
-      particles.forEach((p, i) => {
-        p.update(canvas.width, canvas.height, mouseRef.current);
+      const pLength = particles.length;
+      const mouse = mouseRef.current;
+
+      for (let i = 0; i < pLength; i++) {
+        const p = particles[i];
+        p.update(canvas.width, canvas.height, mouse);
         p.draw();
 
-        for (let j = i + 1; j < particles.length; j++) {
+        // Optimized connection logic
+        for (let j = i + 1; j < pLength; j++) {
           const p2 = particles[j];
-          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-          if (dist < CONNECT_DIST) {
-            const distFactor = 1 - dist / CONNECT_DIST;
-            const midX = (p.x + p2.x) / 2;
-            const midY = (p.y + p2.y) / 2;
-            const mDx = mouseRef.current.x - midX;
-            const mDy = mouseRef.current.y - midY;
-            const mDist = Math.sqrt(mDx * mDx + mDy * mDy);
-            let opacity = distFactor * 0.25;
-            if (mDist < MOUSE_RADIUS) opacity *= (mDist / MOUSE_RADIUS);
-            if (opacity > 0.01) {
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          
+          // Use squared distance for early exit (faster than Math.sqrt/hypot)
+          const distSq = dx * dx + dy * dy;
+          const connectDistSq = settings.connectDist * settings.connectDist;
+
+          if (distSq < connectDistSq) {
+            const dist = Math.sqrt(distSq);
+            const distFactor = 1 - dist / settings.connectDist;
+            
+            // Calculate proximity to mouse for the line to fade it out near the cursor
+            // This prevents "clutter" around the mouse interaction point
+            const midX = (p.x + p2.x) * 0.5;
+            const midY = (p.y + p2.y) * 0.5;
+            const mDx = mouse.x - midX;
+            const mDy = mouse.y - midY;
+            const mDistSq = mDx * mDx + mDy * mDy;
+            
+            let opacity = distFactor * 0.22;
+            
+            // Fade lines near mouse to keep it clean on touch/smaller screens
+            if (mDistSq < settings.mouseRadius * settings.mouseRadius) {
+              const mDist = Math.sqrt(mDistSq);
+              opacity *= (mDist / settings.mouseRadius);
+            }
+
+            if (opacity > 0.015) {
               ctx.strokeStyle = `rgba(56, 189, 248, ${opacity})`;
               ctx.lineWidth = 0.5 + opacity;
               ctx.beginPath();
@@ -125,18 +166,22 @@ const ParticleBackground: React.FC = () => {
             }
           }
         }
-      });
+      }
       animationFrameId = requestAnimationFrame(animate);
     };
 
     const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
       init();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        mouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
     };
 
     const handleMouseLeave = () => {
@@ -145,19 +190,26 @@ const ParticleBackground: React.FC = () => {
 
     init();
     animate();
+    
     window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('touchstart', handleTouchMove);
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchend', handleMouseLeave);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('touchstart', handleTouchMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleMouseLeave);
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 -z-10 pointer-events-none" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 -z-10 pointer-events-none" style={{ touchAction: 'none' }} />;
 };
 
 export default ParticleBackground;
