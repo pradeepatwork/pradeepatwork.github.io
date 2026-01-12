@@ -145,13 +145,28 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-2xl md:text-4xl text-slate-400 font-light tracking-tight max-w-2xl">
-                Embedded Systems Architect.
-              </p>
-              <p className="text-2xl md:text-4xl text-slate-400 font-light tracking-tight max-w-2xl">
-                Building <span className="text-white font-bold">high-integrity firmware</span> for the autonomous edge.
-              </p>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <p className="text-2xl md:text-4xl text-slate-100 font-medium tracking-tight max-w-2xl">
+                  Embedded Systems Architect
+                </p>
+                <p className="text-xl md:text-3xl text-slate-400 font-light tracking-tight max-w-2xl leading-tight">
+                  Real-time firmware for <span className="text-white font-semibold underline decoration-sky-500/30 decoration-2">safety-critical</span> and edge systems
+                </p>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mono text-[10px] md:text-xs font-black text-sky-400/60 tracking-[0.15em] uppercase bg-slate-900/40 p-3 rounded-lg border border-white/5 w-fit">
+                <span className="text-slate-600 font-bold opacity-50"># STACK</span>
+                <span>ARM Cortex-M</span>
+                <span className="text-slate-800">|</span>
+                <span>FreeRTOS</span>
+                <span className="text-slate-800">|</span>
+                <span>STM32</span>
+                <span className="text-slate-800">|</span>
+                <span>ESP32</span>
+                <span className="text-slate-800">|</span>
+                <span>Industrial IoT</span>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-6 pt-4">
