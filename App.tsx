@@ -14,7 +14,9 @@ import {
   Microchip,
   Fingerprint,
   Zap,
-  Activity as PulseIcon
+  Activity as PulseIcon,
+  Timer,
+  ShieldCheck
 } from 'lucide-react';
 import { ExperienceItem, Project, Skill } from './types';
 
@@ -248,6 +250,46 @@ const App: React.FC = () => {
           </div>
         </div>
       </Section>
+
+      {/* Impact Metrics Section */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 mb-32">
+        <div className="mono text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-6 flex items-center gap-4">
+          <span className="h-px flex-grow bg-slate-800/50"></span>
+          Impact Assessment Report
+          <span className="h-px flex-grow bg-slate-800/50"></span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="glass group flex items-center gap-6 p-8 rounded-[2rem] border-white/5 hover:border-sky-500/30 transition-all duration-500">
+            <div className="p-4 bg-slate-900/80 rounded-2xl text-sky-400/80 group-hover:text-sky-400 group-hover:scale-110 transition-all duration-500">
+              <Layers size={32} strokeWidth={1.5} />
+            </div>
+            <div>
+              <div className="text-4xl font-black text-white tracking-tighter shadow-sky-500/10">100+</div>
+              <div className="mono text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-2">Units Deployed</div>
+            </div>
+          </div>
+
+          <div className="glass group flex items-center gap-6 p-8 rounded-[2rem] border-white/5 hover:border-[#818cf8]/30 transition-all duration-500">
+            <div className="p-4 bg-slate-900/80 rounded-2xl text-[#818cf8]/80 group-hover:text-[#818cf8] group-hover:scale-110 transition-all duration-500">
+              <Timer size={32} strokeWidth={1.5} />
+            </div>
+            <div>
+              <div className="text-4xl font-black text-white tracking-tighter">40%</div>
+              <div className="mono text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-2">Boot Time Reduction</div>
+            </div>
+          </div>
+
+          <div className="glass group flex items-center gap-6 p-8 rounded-[2rem] border-white/5 hover:border-emerald-500/30 transition-all duration-500">
+            <div className="p-4 bg-slate-900/80 rounded-2xl text-emerald-400/80 group-hover:text-emerald-400 group-hover:scale-110 transition-all duration-500">
+              <PulseIcon size={32} strokeWidth={1.5} />
+            </div>
+            <div>
+              <div className="text-4xl font-black text-white tracking-tighter">5+</div>
+              <div className="mono text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-2">Sensor Streams</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <Section id="expertise" title="System Capabilities">
         <div className="grid md:grid-cols-3 gap-8">
