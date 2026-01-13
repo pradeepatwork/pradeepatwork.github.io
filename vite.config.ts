@@ -8,9 +8,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    // Ensure the index.html is as clean as possible
-    minify: 'terser',
+    // Use esbuild (default) to fix the 'terser not found' error
+    minify: 'esbuild',
     sourcemap: false,
   }
-  // Removed server.historyApiFallback as it is not supported in Vite's ServerOptions and Vite provides this functionality by default.
 });
