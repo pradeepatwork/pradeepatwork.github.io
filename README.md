@@ -30,4 +30,5 @@ To view this project locally:
 3. (Optional) For a full development environment, use a local server like `npx serve .` to ensure all ES modules load correctly.
 
 ## 📜 License
-© 2026 Pradeep Kumar. All Systems Operational.
+© 2026 Pradeep Kumar. All rights reserved.
+
