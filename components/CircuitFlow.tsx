@@ -57,12 +57,12 @@ const CircuitFlow: React.FC<CircuitFlowProps> = ({ className = "" }) => {
       />
 
       {/* Circuit Container with Hover Transition */}
-      <div className="relative w-full h-full max-w-[500px] lg:max-w-none opacity-25 grayscale-[0.9] group-hover/circuit:opacity-100 group-hover/circuit:grayscale-0 group-hover/circuit:scale-105 transition-all duration-700 ease-out">
+      <div className="relative w-full h-full max-w-[500px] lg:max-w-none opacity-60 grayscale-[0.4] group-hover/circuit:opacity-100 group-hover/circuit:grayscale-0 group-hover/circuit:scale-105 transition-all duration-700 ease-out">
         <svg
           viewBox="-120 -80 1050 750"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full drop-shadow-[0_0_40px_rgba(56,189,248,0.15)]"
+          className="w-full h-full drop-shadow-[0_0_50px_rgba(56,189,248,0.25)]"
         >
           <defs>
             <filter id="glow">
