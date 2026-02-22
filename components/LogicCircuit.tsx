@@ -21,12 +21,12 @@ const LogicCircuit: React.FC<LogicCircuitProps> = ({ className = "" }) => {
       </div>
 
       {/* Main Circuit SVG with Standby Effect */}
-      <div className="relative w-full h-full opacity-25 grayscale-[0.9] group-hover/circuit:opacity-100 group-hover/circuit:grayscale-0 group-hover/circuit:scale-105 transition-all duration-700 ease-out">
+      <div className="relative w-full h-full opacity-60 grayscale-[0.4] group-hover/circuit:opacity-100 group-hover/circuit:grayscale-0 group-hover/circuit:scale-105 transition-all duration-700 ease-out">
         <svg
           viewBox="0 0 800 600"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full"
+          className="w-full h-full drop-shadow-[0_0_50px_rgba(56,189,248,0.2)]"
         >
           <defs>
             <filter id="logicGlow">
